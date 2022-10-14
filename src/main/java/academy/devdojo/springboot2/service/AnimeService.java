@@ -31,5 +31,14 @@ public class AnimeService {
         animes.add(anime);
         return anime;
     }
+
+    public void delete(long id) {
+        animes.remove(findByID(id));
+    }
+
+    public void replace(Anime anime) {
+        delete(anime.getId());
+        animes.add(anime);
+    }
 }
 
