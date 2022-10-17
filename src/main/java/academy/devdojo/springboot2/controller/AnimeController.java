@@ -1,6 +1,8 @@
 package academy.devdojo.springboot2.controller;
 
 import academy.devdojo.springboot2.domain.Anime;
+import academy.devdojo.springboot2.requests.AnimePostReuquestBody;
+import academy.devdojo.springboot2.requests.AnimePutRequestBody;
 import academy.devdojo.springboot2.service.AnimeService;
 import academy.devdojo.springboot2.util.DateUtil;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,12 +32,17 @@ public class AnimeController {
     @GetMapping(path = "/{id}")
     public ResponseEntity<Anime> findById(@PathVariable long id){
         log.info(dateUtil.formatLocalDateTimeToDatabaseStyle(LocalDateTime.now()));
-        return new ResponseEntity<>(animeService.findByID(id), HttpStatus.OK);
+        return new ResponseEntity<>(animeService.findByIDOrThrowBadRequestException(id), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/find")
+    public ResponseEntity<List<Anime>> findByName(@RequestParam String name){
+        return new ResponseEntity<>(animeService.findByName(name), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Anime> save(@RequestBody Anime anime){
-        return new ResponseEntity<>(animeService.save(anime),HttpStatus.CREATED);
+    public ResponseEntity<Anime> save(@RequestBody @Valid AnimePostReuquestBody animePostReuquestBody){
+        return new ResponseEntity<>(animeService.save(animePostReuquestBody),HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "/{id}")
@@ -44,8 +52,8 @@ public class AnimeController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> replace(@RequestBody Anime anime){
-        animeService.replace(anime);
+    public ResponseEntity<Void> replace(@RequestBody AnimePutRequestBody animePutRequestBody){
+        animeService.replace(animePutRequestBody);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
